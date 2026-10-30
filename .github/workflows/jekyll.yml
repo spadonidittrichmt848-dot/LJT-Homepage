@@ -8,6 +8,7 @@ on:
 
 permissions:
   contents: write
+  pages: read
 
 concurrency:
   group: "pages"
@@ -45,3 +46,12 @@ jobs:
           publish_dir: ./_site
           publish_branch: gh-pages
           force_orphan: true
+      - name: Check Pages publishing status
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          curl -sS -w '\nHTTP status: %{http_code}\n' \
+            -H "Authorization: Bearer $GH_TOKEN" \
+            -H "Accept: application/vnd.github+json" \
+            "https://api.github.com/repos/$GITHUB_REPOSITORY/pages"
